@@ -3,6 +3,12 @@
 BrowserSkill 的重要变更记录于此，格式参考 [Keep a Changelog](https://keepachangelog.com/)。
 从 0.2.0 起，CLI、扩展和 DSH 插件使用统一版本号。更新日志的中英文版本须在同一 PR 中同步更新。
 
+## [Unreleased]
+
+### 修复
+
+- `press` 对 `constructor`、`toString`、`__proto__` 等继承属性键名返回 `invalid_params`，不再派发按键事件；与修饰键组合时同样拒绝（[#589](https://github.com/Tencent/BrowserSkill/issues/589)）。
+
 ## [0.4.2] - 2026-11-05
 
 ### 新增

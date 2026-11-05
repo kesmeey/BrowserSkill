@@ -1690,6 +1690,21 @@ describe("resolveKeyDescriptor", () => {
   it("returns null for unknown keys", () => {
     expect(resolveKeyDescriptor("UnknownKey")).toBeNull();
   });
+  it.each([
+    "constructor",
+    "toString",
+    "__proto__",
+    "hasOwnProperty",
+    "valueOf",
+  ])("rejects inherited property name %s", (key) => {
+    expect(resolveKeyDescriptor(key)).toBeNull();
+  });
+  it.each([
+    { key: "F1", windowsVirtualKeyCode: 112 },
+    { key: "F12", windowsVirtualKeyCode: 123 },
+  ])("maps function key $key", ({ key, windowsVirtualKeyCode }) => {
+    expect(resolveKeyDescriptor(key)).toEqual({ key, code: key, windowsVirtualKeyCode });
+  });
   it("maps special keys without requiring CDP casing", () => {
     expect(resolveKeyDescriptor("enter")).toEqual(resolveKeyDescriptor("Enter"));
     expect(resolveKeyDescriptor("ESCAPE")).toEqual(resolveKeyDescriptor("Escape"));
@@ -1961,6 +1976,26 @@ describe("handlePress", () => {
       { cdp: fake.cdp, tabsApi: fake.tabsApi },
     );
     expect(res).toMatchObject({ code: "invalid_params" });
+  });
+
+  it.each([
+    "constructor",
+    "toString",
+    "__proto__",
+    "Ctrl+constructor",
+    "Ctrl+toString",
+    "Ctrl+__proto__",
+  ])("rejects inherited property name %s without dispatching keys", async (key) => {
+    const sm = new SessionManager({ agentWindow: fakeAgentWindow([100]) });
+    await sm.start("aa11");
+    const fake = makeFakeCdp({ "Input.dispatchKeyEvent": () => ({}) });
+    const res = await handlePress(
+      sm,
+      { session_id: "aa11", key },
+      { cdp: fake.cdp, tabsApi: fake.tabsApi },
+    );
+    expect(res).toMatchObject({ code: "invalid_params" });
+    expect(fake.cdp.send).not.toHaveBeenCalled();
   });
 
   it("holds the key for hold_ms between keyDown and keyUp", async () => {

@@ -6,6 +6,15 @@ See the [Chinese changelog](CHANGELOG.zh-CN.md). Update both versions in the sam
 
 Starting from 0.2.0, CLI / Extension / DSH Plugin share the same version number.
 
+## [Unreleased]
+
+### Fixed
+
+- `press` rejects inherited object property names such as `constructor`,
+  `toString` and `__proto__` as `invalid_params` without dispatching key events,
+  including when combined with modifiers
+  ([#589](https://github.com/Tencent/BrowserSkill/issues/589)).
+
 ## [0.4.2] - 2026-11-05
 
 ### Added
